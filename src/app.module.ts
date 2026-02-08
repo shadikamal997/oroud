@@ -7,6 +7,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ShopsModule } from './modules/shops/shops.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { CitiesModule } from './modules/cities/cities.module';
+import { AreasModule } from './modules/areas/areas.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
@@ -32,6 +33,7 @@ import { configModuleOptions } from './config/config-validation.service';
     ShopsModule,
     OffersModule,
     CitiesModule,
+    AreasModule,
     ReportsModule,
     AdminModule,
     NotificationsModule,

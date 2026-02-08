@@ -1,7 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -11,9 +12,95 @@ export class AuthService {
   ) {}
 
   /**
-   * Login with phone number. If user doesn't exist, create automatically.
+   * Register new user with email and password
    */
-  async login(phone: string) {
+  async register(email: string, password: string, role: UserRole = UserRole.USER) {
+    // Check if user exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role,
+        isActive: true,
+      },
+    });
+
+    // Generate JWT token
+    const token = await this.generateAccessToken({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return {
+      access_token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+      },
+    };
+  }
+
+  /**
+   * Login with email and password
+   */
+  async login(email: string, password: string) {
+    // Find user
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user || !user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is disabled');
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Generate JWT token
+    const token = await this.generateAccessToken({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return {
+      access_token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+      },
+    };
+  }
+
+  /**
+   * Login with phone number (backward compatibility)
+   */
+  async loginWithPhone(phone: string) {
     // Find or create user
     let user = await this.prisma.user.findUnique({
       where: { phone },
@@ -39,6 +126,7 @@ export class AuthService {
     const token = await this.generateAccessToken({
       sub: user.id,
       phone: user.phone,
+      email: user.email,
       role: user.role,
     });
 
@@ -61,6 +149,7 @@ export class AuthService {
       select: {
         id: true,
         phone: true,
+        email: true,
         role: true,
         isActive: true,
       },
@@ -99,6 +188,8 @@ export class AuthService {
       where: { id: userId },
       select: {
         id: true,
+        email: true,
+        phone: true,
         role: true,
         isActive: true,
         createdAt: true,

@@ -44,7 +44,9 @@ model Area {
 // User Model
 model User {
   id        String   @id @default(uuid())
-  phone     String   @unique
+  phone     String?  @unique // Made optional for email-only users
+  email     String?  @unique // Added email field
+  password  String?  // Added password hash
   role      UserRole @default(USER)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -56,6 +58,7 @@ model User {
   savedOffers  SavedOffer[]
 
   @@index([phone])
+  @@index([email])
   @@index([role])
   @@map("users")
 }

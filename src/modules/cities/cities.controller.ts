@@ -8,40 +8,34 @@ export class CitiesController {
 
   @Get()
   async findAll() {
-    // TODO: Implement find all cities
-    return { message: 'Get all cities - to be implemented' };
+    return this.citiesService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    // TODO: Implement find one city
-    return { message: `Get city ${id} - to be implemented` };
+    return this.citiesService.findOne(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Body() createDto: any) {
-    // TODO: Implement create city
-    return { message: 'Create city - to be implemented' };
+    return this.citiesService.create(createDto);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async update(@Param('id') id: string, @Body() updateDto: any) {
-    // TODO: Implement update city
-    return { message: `Update city ${id} - to be implemented` };
+    return this.citiesService.update(id, updateDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
-    // TODO: Implement delete city
-    return { message: `Delete city ${id} - to be implemented` };
+    return this.citiesService.remove(id);
   }
 
   @Get(':id/shops')
   async getCityShops(@Param('id') id: string) {
-    // TODO: Implement get city shops
-    return { message: `Get shops for city ${id} - to be implemented` };
+    return this.citiesService.getCityShops(id);
   }
 }
