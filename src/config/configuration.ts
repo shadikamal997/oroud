@@ -9,6 +9,6 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRATION || '24h',
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: process.env.CORS_ORIGINS || '*',
   },
 });
