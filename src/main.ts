@@ -12,14 +12,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Security headers with CSP
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-      },
-    },
-  }));
+  // Security headers
+  app.use(helmet());
 
   // Global prefix
   const apiPrefix = configService.get('API_PREFIX') || 'api';
