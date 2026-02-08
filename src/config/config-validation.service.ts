@@ -39,10 +39,10 @@ export class ConfigValidationService {
     );
 
     if (missingVars.length > 0) {
-      throw new Error(
-        `Missing required environment variables: ${missingVars.join(', ')}\n` +
-        `Please check your .env file and ensure all required variables are set.`
-      );
+      const errorMsg = `Missing required environment variables: ${missingVars.join(', ')}\n` +
+        `Please check your .env file and ensure all required variables are set.`;
+      console.error('❌', errorMsg);
+      throw new Error(errorMsg);
     }
 
     // Warn about Cloudinary if not configured
