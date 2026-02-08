@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Development)
+  db:
+    image: postgres:15-alpine
+    container_name: oroud_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-oroud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oroud_password}
+      POSTGRES_DB: ${POSTGRES_DB:-oroud_db}
+    ports:
+      - "5433:5432"  # Expose on port 5433 for local development
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - oroud_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oroud}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  oroud_network:
+    driver: bridge
