@@ -14,11 +14,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Generate Prisma Client (needed before build)
+RUN npx prisma generate
+
 # Build the application
 RUN npm run build
-
-# Generate Prisma Client
-RUN npx prisma generate
 
 # Stage 2: Production
 FROM node:20-alpine AS production
