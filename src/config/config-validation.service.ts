@@ -98,14 +98,22 @@ export const configModuleOptions = {
   validate: (config: Record<string, any>) => {
     // Validate critical environment variables at startup
     const requiredVars = ['DATABASE_URL', 'JWT_SECRET'];
+    const missingVars: string[] = [];
     
     for (const varName of requiredVars) {
       if (!config[varName]) {
-        throw new Error(
-          `Missing required environment variable: ${varName}\n` +
-          `Please check your environment configuration.`
-        );
+        missingVars.push(varName);
       }
+    }
+
+    if (missingVars.length > 0) {
+      const errorMsg = `Missing required environment variable(s): ${missingVars.join(', ')}\n` +
+        `Please check your environment configuration in Railway dashboard.`;
+      
+      console.error('❌ CONFIGURATION ERROR:', errorMsg);
+      console.error('Available env vars:', Object.keys(config).filter(k => !k.includes('SECRET')).join(', '));
+      
+      throw new Error(errorMsg);
     }
 
     return config;
